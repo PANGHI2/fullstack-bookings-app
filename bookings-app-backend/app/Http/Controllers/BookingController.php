@@ -18,7 +18,12 @@ class BookingController extends Controller
 
     public function getMany(Request $request): JsonResponse
     {
-        $bookings = auth()->user()->bookings()->get();
+        if ($request->has('page')) {
+            // hardcoded 10 bookings per page for the sake of simplicity
+            $bookings = auth()->user()->bookings()->paginate(10);
+        } else {
+            $bookings = auth()->user()->bookings()->get();
+        }
 
         return response()->json($bookings);
     }

@@ -20,6 +20,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Ghita Pantis',
             'email' => 'ghitapantis1@gmail.com',
         ]);
+        User::factory()->create([
+            'name' => 'Alexandra Pantis',
+            'email' => 'alepantis@gmail.com',
+        ]);
 
         Booking::factory(50)->create();
     }

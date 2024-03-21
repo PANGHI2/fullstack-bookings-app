@@ -1,77 +1,184 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Installation Guide for Bookings REST API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This REST API, designed for managing bookings within an application, leverages JWT for authentication. It uses a Laravel application, version 10.2.5.
 
-## About Laravel
+## Prerequisites
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and
-creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in
-many web projects, such as:
+- PHP 8.3 or higher
+- Composer
+- SQLite
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache)
-  storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Initial Setup
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Install Dependencies
 
-## Learning Laravel
+Laravel and JWT auth depend on various PHP packages. Install them with Composer:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all
-modern web application frameworks, making it a breeze to get started with the framework.
+```sh
+composer install
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a
-modern Laravel application from scratch.
+### Environment Configuration
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video
-tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging
-into our comprehensive video library.
+1. **Copy Environment File**: Start by duplicating the `.env.example` file to `.env` to create your application's environment configuration.
 
-## Laravel Sponsors
+    ```sh
+    cp .env.example .env
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in
-becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+2. **Generate Application Key**: Laravel uses this key for application-level encryption and security.
 
-### Premium Partners
+    ```sh
+    php artisan key:generate
+    ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+    This command automatically updates your `.env` file with an appropriate `APP_KEY`.
 
-## Contributing
+3. **Generate JWT Secret**: Essential for JWT authentication.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in
-the [Laravel documentation](https://laravel.com/docs/contributions).
+    ```sh
+    php artisan jwt:secret
+    ```
 
-## Code of Conduct
+    It adds a `JWT_SECRET` to your `.env` file, used to sign your tokens.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by
-the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. **Database Connection**: If using SQLite, update your `.env` file to use SQLite as the database connection. Also, ensure you have the database file created if it doesn't exist.
 
-## Security Vulnerabilities
+    ```plaintext
+    DB_CONNECTION=sqlite
+    DB_DATABASE=/path/to/database.sqlite
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell
-via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    For SQLite, an empty database file has to be created:
 
-## License
+    ```sh
+    touch database/database.sqlite
+    ```
+5. **Database Migrations and Seeders**: To set up your database schema and repopulate it with initial data, run the following command:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    ```sh
+    php artisan migrate:refresh --seed
+    ```
+
+### Running the Application
+
+You can start the Laravel development server by executing:
+
+    php artisan serve
+
+This command starts a development server on `http://localhost:8000`, allowing you to access the backend application and its APIs.
+
+# Authentication API Endpoints
+
+## Overview
+
+This section covers the authentication-related endpoints of the API. These endpoints facilitate user authentication actions, including login, token refresh, logout, and retrieving current user details.
+
+### Login
+
+- **Endpoint**: `POST /api/auth/login`
+- **Description**: Authenticates the user with email and password, and returns a token upon success.
+- **Body**:
+    ```json
+    {
+      "email": "string",
+      "password": "string"
+    }
+    ```
+- **Success Response**: Token and user details.
+
+### Refresh Token
+
+- **Endpoint**: `POST /api/auth/refresh`
+- **Description**: Refreshes the user's authentication token.
+- **Required Headers**:
+    - `Authorization: Bearer <Token>`
+- **Success Response**: A new token.
+
+### Logout
+
+- **Endpoint**: `POST /api/auth/logout`
+- **Description**: Logs out the user and invalidates the current token.
+- **Required Headers**:
+    - `Authorization: Bearer <Token>`
+- **Success Response**: Confirmation of logout.
+
+### Get Current User
+
+- **Endpoint**: `POST /api/auth/me`
+- **Description**: Returns details of the currently logged-in user.
+- **Required Headers**:
+    - `Authorization: Bearer <Token>`
+- **Success Response**: User details.
+
+# Bookings API Endpoints
+
+## Overview
+
+This section describes the endpoints related to bookings management in the API. These endpoints allow users to create, update, fetch, and delete booking records.
+
+### Create a Booking
+
+- **Endpoint**: `POST /api/bookings`
+- **Description**: Creates a new booking record with the provided details.
+- **Body**:
+    ```json
+    {
+      "fullname": "string",
+      "roomNumber": "string",
+      "checkIn": "YYYY-MM-DD",
+      "checkOut": "YYYY-MM-DD"
+    }
+    ```
+- **Required Headers**:
+    - `Authorization: Bearer <Token>`
+- **Success Response**: Details of the created booking.
+
+### Update a Booking
+
+- **Endpoint**: `PUT /api/bookings/{id}`
+- **Description**: Updates an existing booking record identified by `{id}`.
+- **Parameters**:
+    - `id`: Booking ID to update.
+- **Body**:
+    ```json
+    {
+      "fullname": "string",
+      "roomNumber": "string",
+      "checkIn": "YYYY-MM-DD",
+      "checkOut": "YYYY-MM-DD"
+    }
+    ```
+- **Required Headers**:
+    - `Authorization: Bearer <Token>`
+- **Success Response**: Updated booking details.
+
+### Get All Bookings
+
+- **Endpoint**: `GET /api/bookings`
+- **Description**: Retrieves all bookings for the currently logged-in user, supports optional pagination.
+- **Query Parameters**:
+    - `page`: Optional. The page number of bookings to retrieve.
+- **Required Headers**:
+    - `Authorization: Bearer <Token>`
+- **Success Response**: A list of bookings, optionally paginated.
+
+### Get a Single Booking
+
+- **Endpoint**: `GET /api/bookings/{id}`
+- **Description**: Retrieves details of a specific booking identified by `{id}`.
+- **Parameters**:
+    - `id`: Booking ID to retrieve.
+- **Required Headers**:
+    - `Authorization: Bearer <Token>`
+- **Success Response**: Details of the specified booking.
+
+### Delete a Booking
+
+- **Endpoint**: `DELETE /api/bookings/{id}`
+- **Description**: Deletes a specific booking identified by `{id}`.
+- **Parameters**:
+    - `id`: Booking ID to delete.
+- **Required Headers**:
+    - `Authorization: Bearer <Token>`
+- **Success Response**: Confirmation of the booking deletion.

@@ -1,13 +1,16 @@
-import { CanActivateFn, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { inject } from '@angular/core';
 
-export const authGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
-  const router = inject(Router);
+export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
+  const authService: AuthService = inject(AuthService);
+  const router: Router = inject(Router);
 
-  const isAuthenticated = authService.isAuthenticated();
-  if (!isAuthenticated) {
+  const isTokenMissing: boolean = !authService.getToken();
+  const isTokenExpired: boolean = authService.isTokenExpired();
+
+  if (isTokenMissing || isTokenExpired) {
+    authService.deleteTokenData();
     router.navigate(['/login']);
     return false;
   }

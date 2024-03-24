@@ -3,9 +3,9 @@ import { environment } from '../../config/environment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, finalize, Observable, switchMap, take, tap, throwError } from 'rxjs';
-import { AuthUserResponse } from '../models/api/auth-user-response';
-import { LoginRequest } from '../models/api/login-request';
-import { AccessTokenResponse } from '../models/api/access-token-response';
+import { GetAuthUserResponse } from '../models/api/auth/get-auth-user-response';
+import { LoginRequest } from '../models/api/auth/login-request';
+import { LoginResponse } from '../models/api/auth/login-response';
 import { MessageResponse } from '../models/api/message-response';
 import { AuthTokenService } from './auth-token.service';
 import { API_ENDPOINTS } from '../utils/constants';
@@ -22,12 +22,12 @@ export class AuthService {
         this.authTokenService.authTokenExpirationSubject.pipe(switchMap(() => this.refresh())).subscribe();
     }
 
-    public login(loginRequest: LoginRequest): Observable<AccessTokenResponse | null> {
+    public login(loginRequest: LoginRequest): Observable<LoginResponse | null> {
         const loginUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_login}`;
 
-        return this.http.post<AccessTokenResponse>(loginUrl, loginRequest).pipe(
+        return this.http.post<LoginResponse>(loginUrl, loginRequest).pipe(
             take(1),
-            tap((loginResponse: AccessTokenResponse): void => {
+            tap((loginResponse: LoginResponse): void => {
                 this.refreshAuth(loginResponse.access_token, (loginResponse.expires_in - 30) * 1000);
                 this.router.navigate(['/dashboard']);
             }),
@@ -38,12 +38,12 @@ export class AuthService {
         );
     }
 
-    public refresh(): Observable<AccessTokenResponse | null> {
+    public refresh(): Observable<LoginResponse | null> {
         const refreshUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_refresh}`;
         console.log('trying to call refresh ep');
-        return this.http.post<AccessTokenResponse>(refreshUrl, {}).pipe(
+        return this.http.post<LoginResponse>(refreshUrl, {}).pipe(
             take(1),
-            tap((loginResponse: AccessTokenResponse): void => {
+            tap((loginResponse: LoginResponse): void => {
                 this.refreshAuth(loginResponse.access_token, (loginResponse.expires_in - 30) * 1000);
             }),
             catchError((error: MessageResponse): Observable<never> => {
@@ -72,11 +72,11 @@ export class AuthService {
         );
     }
 
-    public getAuthUser(): Observable<AuthUserResponse> {
+    public getAuthUser(): Observable<GetAuthUserResponse> {
         const authUserInfoUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_user}`;
 
-        return this.http.get<AuthUserResponse>(authUserInfoUrl).pipe(
-            tap((authUserInfoResponse: AuthUserResponse): void => {
+        return this.http.get<GetAuthUserResponse>(authUserInfoUrl).pipe(
+            tap((authUserInfoResponse: GetAuthUserResponse): void => {
                 console.log(`${authUserInfoUrl} response:`, authUserInfoResponse);
             }),
             catchError((error: MessageResponse): Observable<never> => {

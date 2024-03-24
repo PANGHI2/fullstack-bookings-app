@@ -15,7 +15,7 @@ export class AuthTokenService {
     /* Auth Token Storage Utils*/
     public saveAuthTokenData(authToken: string, expiresInMillis: number): void {
         localStorage.setItem(LOCAL_STORAGE_KEYS.auth_token, authToken);
-        localStorage.setItem(LOCAL_STORAGE_KEYS.auth_token_expiration_timestamp, `${Date.now() + expiresInMillis}`);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.auth_token_expiration_timestamp, String(Date.now() + expiresInMillis));
     }
 
     public deleteAuthTokenData(): void {

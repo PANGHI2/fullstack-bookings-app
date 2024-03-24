@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AuthenticationComponent } from './components/authentication/authentication.component';
+import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -16,7 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { HttpRestAuthInterceptor } from './interceptors/http-rest-auth.interceptor.service';
 
 @NgModule({
-    declarations: [AppComponent, AuthenticationComponent, DashboardComponent],
+    declarations: [AppComponent, LoginComponent, DashboardComponent],
     imports: [
         AppRoutingModule,
         BrowserAnimationsModule,

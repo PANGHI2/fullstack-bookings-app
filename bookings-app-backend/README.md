@@ -105,7 +105,7 @@ This section covers the authentication-related endpoints of the API. These endpo
 
 ### Get Current User
 
-- **Endpoint**: `POST /api/auth/me`
+- **Endpoint**: `POST /api/auth/user`
 - **Description**: Returns details of the currently logged-in user.
 - **Required Headers**:
     - `Authorization: Bearer <Token>`

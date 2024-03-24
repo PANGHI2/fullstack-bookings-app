@@ -1,33 +1,23 @@
-:host {
-  background-image: url('/assets/bg-login.png');
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-}
-
 .login-wrapper {
-  mat-card {
-    width: fit-content;
-    height: fit-content;
-    padding: 1rem 3rem;
+    mat-card {
+        width: fit-content;
+        height: fit-content;
+        padding: 1rem 3rem;
 
-    mat-card-header {
-      justify-content: center;
-      text-transform: uppercase;
-    }
+        mat-card-header {
+            justify-content: center;
+            text-transform: uppercase;
+        }
 
-    mat-card-content {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
-      min-height: 12rem;
-    }
+        mat-card-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            min-height: 12rem;
+        }
 
-    mat-card-actions {
-      justify-content: center;
+        mat-card-actions {
+            justify-content: center;
+        }
     }
-  }
 }

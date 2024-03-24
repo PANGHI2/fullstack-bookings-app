@@ -1,48 +1,52 @@
 <main class="login-wrapper">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Authentication</mat-card-title>
-    </mat-card-header>
-    <form #loginForm="ngForm" (ngSubmit)="login()">
-      <mat-card-content>
-        <div>
-          <mat-form-field appearance="outline">
-            <mat-label>E-mail</mat-label>
-            <input
-              #emailField="ngModel"
-              matInput
-              type="email"
-              placeholder="Your e-mail"
-              name="email"
-              [(ngModel)]="email"
-              email
-              required
-            />
-            <mat-icon matSuffix>alternate_email</mat-icon>
-            <mat-error *ngIf="emailField.errors?.['required']"> Email is required. </mat-error>
-            <mat-error *ngIf="emailField.errors?.['email']"> Please enter a valid email address. </mat-error>
-          </mat-form-field>
-        </div>
-        <div>
-          <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
-            <input
-              #passwordField="ngModel"
-              matInput
-              type="password"
-              placeholder="Your password"
-              name="password"
-              [(ngModel)]="password"
-              required
-            />
-            <mat-icon matSuffix>key</mat-icon>
-            <mat-error *ngIf="passwordField.errors?.['required']"> Password is required. </mat-error>
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.form.valid">Sign In</button>
-      </mat-card-actions>
-    </form>
-  </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Authentication</mat-card-title>
+        </mat-card-header>
+        <form #loginForm="ngForm" (ngSubmit)="login()">
+            <mat-card-content>
+                <div class="login-wrapper__form-field">
+                    <mat-form-field appearance="outline">
+                        <mat-label>E-mail</mat-label>
+                        <input
+                            #emailField="ngModel"
+                            matInput
+                            type="email"
+                            placeholder="Your e-mail"
+                            name="email"
+                            [(ngModel)]="email"
+                            email
+                            required
+                        />
+                        <mat-icon matSuffix>alternate_email</mat-icon>
+                        <mat-error *ngIf="emailField.errors?.['required']"> Email is required. </mat-error>
+                        <mat-error *ngIf="emailField.errors?.['email']">
+                            Please enter a valid email address.
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="login-wrapper__form-field">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Password</mat-label>
+                        <input
+                            #passwordField="ngModel"
+                            matInput
+                            type="password"
+                            placeholder="Your password"
+                            name="password"
+                            [(ngModel)]="password"
+                            required
+                        />
+                        <mat-icon matSuffix>key</mat-icon>
+                        <mat-error *ngIf="passwordField.errors?.['required']"> Password is required. </mat-error>
+                    </mat-form-field>
+                </div>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.form.valid">
+                    Sign In
+                </button>
+            </mat-card-actions>
+        </form>
+    </mat-card>
 </main>

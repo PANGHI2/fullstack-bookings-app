@@ -2,52 +2,98 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../config/environment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
-import { LoginResponse } from '../models/login-response';
+import { catchError, finalize, Observable, switchMap, take, tap, throwError } from 'rxjs';
+import { AuthUserResponse } from '../models/auth-user-response';
 import { LoginRequest } from '../models/login-request';
+import { AccessTokenResponse } from '../models/access-token-response';
+import { MessageResponse } from '../models/message-response';
+import { AuthTokenService } from './auth-token.service';
+import { API_ENDPOINTS } from '../utils/constants';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl: string = `${environment.apiUrl}/auth`;
+    constructor(
+        private http: HttpClient,
+        private router: Router,
+        private authTokenService: AuthTokenService
+    ) {
+        this.authTokenService.authTokenExpirationSubject.pipe(switchMap(() => this.refresh())).subscribe();
+    }
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {}
+    public login(loginRequest: LoginRequest): Observable<AccessTokenResponse | null> {
+        const loginUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_login}`;
 
-  login(loginRequest: LoginRequest): Observable<LoginResponse> {
-    const loginUrl: string = `${this.apiUrl}/login`;
-    return this.http.post<LoginResponse>(loginUrl, loginRequest).pipe(
-      tap((loginResponse: LoginResponse): void => {
-        this.storeTokenData(loginResponse);
-        this.router.navigate(['/dashboard']);
-      })
-    );
-  }
+        return this.http.post<AccessTokenResponse>(loginUrl, loginRequest).pipe(
+            take(1),
+            tap((loginResponse: AccessTokenResponse): void => {
+                this.refreshAuth(loginResponse.access_token, (loginResponse.expires_in - 30) * 1000);
+                this.router.navigate(['/dashboard']);
+            }),
+            catchError((error: MessageResponse): Observable<never> => {
+                console.log(`${loginUrl} request error: `, error);
+                return throwError(() => error);
+            })
+        );
+    }
 
-  isLoggedIn(): boolean {
-    return !!this.getToken() && !this.isTokenExpired();
-  }
+    public refresh(): Observable<AccessTokenResponse | null> {
+        const refreshUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_refresh}`;
+        console.log('trying to call refresh ep');
+        return this.http.post<AccessTokenResponse>(refreshUrl, {}).pipe(
+            take(1),
+            tap((loginResponse: AccessTokenResponse): void => {
+                this.refreshAuth(loginResponse.access_token, (loginResponse.expires_in - 30) * 1000);
+            }),
+            catchError((error: MessageResponse): Observable<never> => {
+                this.clearAuth();
+                this.router.navigate(['/login']);
 
-  storeTokenData(loginResponse: LoginResponse): void {
-    sessionStorage.setItem('access_token', loginResponse.access_token);
-    sessionStorage.setItem('access_token_expiration_timestamp', `${Date.now() + loginResponse.expires_in * 1000}`);
-  }
+                console.log(`${refreshUrl} request error: `, error);
+                return throwError(() => error);
+            })
+        );
+    }
 
-  deleteTokenData(): void {
-    sessionStorage.removeItem('access_token');
-    sessionStorage.removeItem('access_token_expiration_timestamp');
-  }
+    public logout(): Observable<MessageResponse> {
+        const logoutUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_logout}`;
 
-  getToken(): string | null {
-    return sessionStorage.getItem('access_token');
-  }
+        return this.http.post<MessageResponse>(logoutUrl, {}).pipe(
+            take(1),
+            catchError((error: MessageResponse): Observable<never> => {
+                console.log(`${logoutUrl} request error: `, error);
+                return throwError(() => error);
+            }),
+            finalize((): void => {
+                this.clearAuth();
+                this.router.navigate(['/login']);
+            })
+        );
+    }
 
-  isTokenExpired(): boolean {
-    const accessTokenExpirationTimestamp: string | null = sessionStorage.getItem('access_token_expiration_timestamp');
+    public getAuthUser(): Observable<AuthUserResponse> {
+        const authUserInfoUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_user}`;
 
-    return !accessTokenExpirationTimestamp || +accessTokenExpirationTimestamp < Date.now();
-  }
+        return this.http.get<AuthUserResponse>(authUserInfoUrl).pipe(
+            tap((authUserInfoResponse: AuthUserResponse): void => {
+                console.log(`${authUserInfoUrl} response:`, authUserInfoResponse);
+            }),
+            catchError((error: MessageResponse): Observable<never> => {
+                console.log(`${authUserInfoUrl} request error: `, error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    public clearAuth(): void {
+        this.authTokenService.clearAuthTokenExpirationTimer();
+        this.authTokenService.deleteAuthTokenData();
+    }
+
+    public refreshAuth(authToken: string, expiresInMillis: number): void {
+        this.clearAuth();
+        this.authTokenService.saveAuthTokenData(authToken, expiresInMillis);
+        this.authTokenService.startAuthTokenExpirationTimer(expiresInMillis);
+    }
 }

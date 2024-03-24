@@ -6,13 +6,13 @@ import { authGuard } from './guards/auth.guard';
 import { noAuthGuard } from './guards/no-auth.guard';
 
 const routes: Routes = [
-  { path: 'login', component: AuthenticationComponent, canActivate: [noAuthGuard] },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: '**', redirectTo: '/dashboard' },
+    { path: 'login', component: AuthenticationComponent, canActivate: [noAuthGuard] },
+    { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+    { path: '**', redirectTo: '/dashboard' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule],
 })
 export class AppRoutingModule {}

@@ -11,7 +11,7 @@ export class AuthenticationComponent {
     public email: string = '';
     public password: string = '';
 
-    constructor(private authenticationService: AuthService) {}
+    constructor(private authService: AuthService) {}
 
     public login(): void {
         console.log(`Trying login with email:${this.email} password:${this.password}`);
@@ -21,6 +21,6 @@ export class AuthenticationComponent {
             password: this.password,
         };
 
-        this.authenticationService.login(loginRequest).subscribe();
+        this.authService.login(loginRequest).subscribe();
     }
 }

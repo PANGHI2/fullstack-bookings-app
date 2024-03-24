@@ -1,4 +1,4 @@
-.login-wrapper {
+.login-container {
     mat-card {
         width: fit-content;
         height: fit-content;
@@ -14,6 +14,14 @@
             flex-direction: column;
             justify-content: space-evenly;
             min-height: 12rem;
+
+            mat-form-field {
+                display: block;
+            }
+        }
+
+        mat-divider {
+          margin-bottom: 0.5rem;
         }
 
         mat-card-actions {

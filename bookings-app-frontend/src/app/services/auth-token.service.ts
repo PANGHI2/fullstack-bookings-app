@@ -13,12 +13,12 @@ export class AuthTokenService {
     constructor() {}
 
     /* Auth Token Storage Utils*/
-    saveAuthTokenData(authToken: string, expiresInMillis: number): void {
+    public saveAuthTokenData(authToken: string, expiresInMillis: number): void {
         localStorage.setItem(LOCAL_STORAGE_KEYS.auth_token, authToken);
         localStorage.setItem(LOCAL_STORAGE_KEYS.auth_token_expiration_timestamp, `${Date.now() + expiresInMillis}`);
     }
 
-    deleteAuthTokenData(): void {
+    public deleteAuthTokenData(): void {
         localStorage.removeItem(LOCAL_STORAGE_KEYS.auth_token);
         localStorage.removeItem(LOCAL_STORAGE_KEYS.auth_token_expiration_timestamp);
     }
@@ -37,19 +37,19 @@ export class AuthTokenService {
     /**/
 
     /* Auth Token Expiration Timer */
-    startAuthTokenExpirationTimer(expiresInMillis: number): void {
+    public startAuthTokenExpirationTimer(expiresInMillis: number): void {
         console.log('timer set for millis: ', expiresInMillis);
         this.authTokenExpirationTimerSubscription = timer(expiresInMillis)
             .pipe(
                 take(1),
-                tap(() => {
+                tap((): void => {
                     this.authTokenExpirationSubject.next();
                 })
             )
             .subscribe();
     }
 
-    clearAuthTokenExpirationTimer(): void {
+    public clearAuthTokenExpirationTimer(): void {
         this.authTokenExpirationTimerSubscription?.unsubscribe();
         this.authTokenExpirationTimerSubscription = null;
     }

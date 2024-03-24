@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {AuthService} from "../../services/auth.service";
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -10,9 +10,9 @@ export class DashboardComponent {
     constructor(private authService: AuthService) {}
 
     public logout(): void {
-      console.log(`Trying logout`);
+        console.log(`Trying logout`);
 
-      this.authService.logout().subscribe();
+        this.authService.logout().subscribe();
     }
 
     public openDialog(dialogType: string): void {

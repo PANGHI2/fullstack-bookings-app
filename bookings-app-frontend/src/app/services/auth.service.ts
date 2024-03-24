@@ -3,10 +3,10 @@ import { environment } from '../../config/environment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, finalize, Observable, switchMap, take, tap, throwError } from 'rxjs';
-import { AuthUserResponse } from '../models/auth-user-response';
-import { LoginRequest } from '../models/login-request';
-import { AccessTokenResponse } from '../models/access-token-response';
-import { MessageResponse } from '../models/message-response';
+import { AuthUserResponse } from '../models/api/auth-user-response';
+import { LoginRequest } from '../models/api/login-request';
+import { AccessTokenResponse } from '../models/api/access-token-response';
+import { MessageResponse } from '../models/api/message-response';
 import { AuthTokenService } from './auth-token.service';
 import { API_ENDPOINTS } from '../utils/constants';
 

@@ -9,11 +9,6 @@ class Booking extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<string>
-     */
     protected $fillable = [
         'user_id',
         'fullname',
@@ -22,19 +17,11 @@ class Booking extends Model
         'checkOut',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'checkIn' => 'datetime',
-        'checkOut' => 'datetime',
+    protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 
-    /**
-     * Get the user that owns the booking.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);

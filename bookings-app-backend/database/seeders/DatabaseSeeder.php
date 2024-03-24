@@ -25,6 +25,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'alepantis@gmail.com',
         ]);
 
-        Booking::factory(50)->create();
+        Booking::factory(200)->create();
     }
 }

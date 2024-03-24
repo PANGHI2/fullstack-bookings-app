@@ -1,6 +1,7 @@
 # Installation Guide for Bookings REST API
 
-This REST API, designed for managing bookings within an application, leverages JWT for authentication. It uses a Laravel application, version 10.2.5.
+This REST API, designed for managing bookings within an application, leverages JWT for authentication. It uses a Laravel
+application, version 10.2.5.
 
 ## Prerequisites
 
@@ -20,7 +21,8 @@ composer install
 
 ### Environment Configuration
 
-1. **Copy Environment File**: Start by duplicating the `.env.example` file to `.env` to create your application's environment configuration.
+1. **Copy Environment File**: Start by duplicating the `.env.example` file to `.env` to create your application's
+   environment configuration.
 
     ```sh
     cp .env.example .env
@@ -32,7 +34,7 @@ composer install
     php artisan key:generate
     ```
 
-    This command automatically updates your `.env` file with an appropriate `APP_KEY`.
+   This command automatically updates your `.env` file with an appropriate `APP_KEY`.
 
 3. **Generate JWT Secret**: Essential for JWT authentication.
 
@@ -40,21 +42,23 @@ composer install
     php artisan jwt:secret
     ```
 
-    It adds a `JWT_SECRET` to your `.env` file, used to sign your tokens.
+   It adds a `JWT_SECRET` to your `.env` file, used to sign your tokens.
 
-4. **Database Connection**: If using SQLite, update your `.env` file to use SQLite as the database connection. Also, ensure you have the database file created if it doesn't exist.
+4. **Database Connection**: If using SQLite, update your `.env` file to use SQLite as the database connection. Also,
+   ensure you have the database file created if it doesn't exist.
 
     ```plaintext
     DB_CONNECTION=sqlite
     DB_DATABASE=/path/to/database.sqlite
     ```
 
-    For SQLite, an empty database file has to be created:
+   For SQLite, an empty database file has to be created:
 
     ```sh
     touch database/database.sqlite
     ```
-5. **Database Migrations and Seeders**: To set up your database schema and repopulate it with initial data, run the following command:
+5. **Database Migrations and Seeders**: To set up your database schema and repopulate it with initial data, run the
+   following command:
 
     ```sh
     php artisan migrate:refresh --seed
@@ -66,13 +70,15 @@ You can start the Laravel development server by executing:
 
     php artisan serve
 
-This command starts a development server on `http://localhost:8000`, allowing you to access the backend application and its APIs.
+This command starts a development server on `http://localhost:8000`, allowing you to access the backend application and
+its APIs.
 
 # Authentication API Endpoints
 
 ## Overview
 
-This section covers the authentication-related endpoints of the API. These endpoints facilitate user authentication actions, including login, token refresh, logout, and retrieving current user details.
+This section covers the authentication-related endpoints of the API. These endpoints facilitate user authentication
+actions, including login, token refresh, logout, and retrieving current user details.
 
 ### Login
 
@@ -115,7 +121,8 @@ This section covers the authentication-related endpoints of the API. These endpo
 
 ## Overview
 
-This section describes the endpoints related to bookings management in the API. These endpoints allow users to create, update, fetch, and delete booking records.
+This section describes the endpoints related to bookings management in the API. These endpoints allow users to create,
+update, fetch, and delete booking records.
 
 ### Create a Booking
 

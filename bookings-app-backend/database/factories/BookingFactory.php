@@ -17,12 +17,15 @@ class BookingFactory extends Factory
      */
     public function definition(): array
     {
+        $checkIn = fake()->dateTimeBetween('-4 weeks', '+3 weeks');
+        $checkOut = fake()->dateTimeBetween((clone $checkIn)->modify('+1 day'), '+4 weeks');
+
         return [
             'user_id' => fake()->numberBetween(11, 12),
             'fullname' => fake()->name(),
             'roomNumber' => fake()->bothify('Room ##??'),
-            'checkIn' => fake()->dateTimeBetween('-1 week', '+1 week'),
-            'checkOut' => fake()->dateTimeBetween('+1 week', '+2 weeks'),
+            'checkIn' => $checkIn->getTimestamp(),
+            'checkOut' => $checkOut->getTimestamp(),
         ];
     }
 }

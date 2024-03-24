@@ -15,8 +15,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->string('fullname');
             $table->string('roomNumber');
-            $table->dateTime('checkIn');
-            $table->dateTime('checkOut');
+            $table->unsignedBigInteger('checkIn');
+            $table->unsignedBigInteger('checkOut');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

@@ -18,11 +18,26 @@ class BookingController extends Controller
 
     public function getMany(Request $request): JsonResponse
     {
+        $from = $request->query('from');
+        $to = $request->query('to');
+
+        $bookingsQuery = auth()->user()->bookings();
+        if ($from && $to) {
+            $bookingsQuery->where(function ($q) use ($from, $to) {
+                $q->where('checkin', '<', $from)
+                    ->where('checkout', '>', $to);
+            })->orWhereBetween('checkin', [$from, $to])
+                ->orWhereBetween('checkout', [$from, $to]);
+        } elseif ($from) {
+            $bookingsQuery->where('checkout', '>=', $from);
+        } elseif ($to) {
+            $bookingsQuery->where('checkin', '<=', $to);
+        }
+
         if ($request->has('page')) {
-            // hardcoded 10 bookings per page for the sake of simplicity
-            $bookings = auth()->user()->bookings()->paginate(10);
+            $bookings = $bookingsQuery->paginate(10);
         } else {
-            $bookings = auth()->user()->bookings()->get();
+            $bookings = $bookingsQuery->get();
         }
 
         return response()->json($bookings);

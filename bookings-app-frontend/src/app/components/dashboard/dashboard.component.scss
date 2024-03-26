@@ -1,1 +1,69 @@
 @import '../../styles/_main-container';
+
+mat-card {
+    min-height: 90vh;
+    max-height: 90vh;
+
+    mat-card-content {
+        min-height: calc(90vh - 194px);
+        justify-content: revert;
+
+        .table-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-height: calc(90vh - 282px);
+            padding: 2rem 8rem 0 8rem;
+
+            .table-actions {
+                position: absolute;
+                top: calc(2rem - 20px);
+                left: calc(8rem - 20px);
+                z-index: 101;
+            }
+
+            .table-scroll {
+                overflow-y: auto;
+
+                table {
+                    background: #f7f7f7;
+
+                    th {
+                        background: #efefef;
+                    }
+
+                    th,
+                    td {
+                        width: 10rem;
+                        padding-inline: 1.5rem;
+                        text-align: center;
+
+                        &:last-of-type {
+                            width: 12rem;
+
+                            button {
+                                margin-inline: 0.25rem;
+                            }
+                        }
+                    }
+                }
+
+                .loading-wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: 1rem;
+
+                    mat-spinner {
+                        margin-bottom: 0.5rem;
+                    }
+                }
+            }
+        }
+    }
+
+    mat-paginator {
+        align-self: center;
+    }
+}

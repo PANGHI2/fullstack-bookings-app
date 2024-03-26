@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../config/environment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, finalize, Observable, switchMap, take, tap, throwError } from 'rxjs';
-import { GetAuthUserResponse } from '../models/api/auth/get-auth-user-response';
-import { LoginRequest } from '../models/api/auth/login-request';
-import { LoginResponse } from '../models/api/auth/login-response';
-import { MessageResponse } from '../models/api/message-response';
+import { finalize, Observable, switchMap, take, tap } from 'rxjs';
+import { GetAuthUserResponse } from '../models/api/auth/get-auth-user-response.model';
+import { LoginRequest } from '../models/api/auth/login-request.model';
+import { LoginResponse, RefreshResponse } from '../models/api/auth/login-refresh-response.model';
+import { MessageResponse } from '../models/api/message-response.model';
 import { AuthTokenService } from './auth-token.service';
-import { API_ENDPOINTS } from '../utils/constants';
+import { API_ENDPOINTS } from '../utils/constants.utils';
 
 @Injectable({
     providedIn: 'root',
@@ -22,36 +22,31 @@ export class AuthService {
         this.authTokenService.authTokenExpirationSubject.pipe(switchMap(() => this.refresh())).subscribe();
     }
 
-    public login(loginRequest: LoginRequest): Observable<LoginResponse | null> {
+    public login(loginRequest: LoginRequest): Observable<LoginResponse> {
         const loginUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_login}`;
 
         return this.http.post<LoginResponse>(loginUrl, loginRequest).pipe(
             take(1),
-            tap((loginResponse: LoginResponse): void => {
-                this.refreshAuth(loginResponse.access_token, (loginResponse.expires_in - 30) * 1000);
+            tap(({ access_token, expires_in }: LoginResponse): void => {
+                this.refreshAuth(access_token, (expires_in - 30) * 1000);
                 this.router.navigate(['/dashboard']);
-            }),
-            catchError((error: MessageResponse): Observable<never> => {
-                console.log(`${loginUrl} request error: `, error);
-                return throwError(() => error);
             })
         );
     }
 
-    public refresh(): Observable<LoginResponse | null> {
+    public refresh(): Observable<RefreshResponse> {
         const refreshUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_refresh}`;
-        console.log('trying to call refresh ep');
-        return this.http.post<LoginResponse>(refreshUrl, {}).pipe(
-            take(1),
-            tap((loginResponse: LoginResponse): void => {
-                this.refreshAuth(loginResponse.access_token, (loginResponse.expires_in - 30) * 1000);
-            }),
-            catchError((error: MessageResponse): Observable<never> => {
-                this.clearAuth();
-                this.router.navigate(['/login']);
 
-                console.log(`${refreshUrl} request error: `, error);
-                return throwError(() => error);
+        return this.http.post<RefreshResponse>(refreshUrl, {}).pipe(
+            take(1),
+            tap({
+                next: ({ access_token, expires_in }: RefreshResponse): void => {
+                    this.refreshAuth(access_token, (expires_in - 30) * 1000);
+                },
+                error: (): void => {
+                    this.clearAuth();
+                    this.router.navigate(['/login']);
+                },
             })
         );
     }
@@ -61,10 +56,6 @@ export class AuthService {
 
         return this.http.post<MessageResponse>(logoutUrl, {}).pipe(
             take(1),
-            catchError((error: MessageResponse): Observable<never> => {
-                console.log(`${logoutUrl} request error: `, error);
-                return throwError(() => error);
-            }),
             finalize((): void => {
                 this.clearAuth();
                 this.router.navigate(['/login']);
@@ -75,25 +66,23 @@ export class AuthService {
     public getAuthUser(): Observable<GetAuthUserResponse> {
         const authUserInfoUrl: string = `${environment.apiUrl}${API_ENDPOINTS.auth_user}`;
 
-        return this.http.get<GetAuthUserResponse>(authUserInfoUrl).pipe(
-            tap((authUserInfoResponse: GetAuthUserResponse): void => {
-                console.log(`${authUserInfoUrl} response:`, authUserInfoResponse);
-            }),
-            catchError((error: MessageResponse): Observable<never> => {
-                console.log(`${authUserInfoUrl} request error: `, error);
-                return throwError(() => error);
-            })
-        );
+        return this.http.get<GetAuthUserResponse>(authUserInfoUrl);
     }
 
     public clearAuth(): void {
+        console.log('clear auth');
         this.authTokenService.clearAuthTokenExpirationTimer();
         this.authTokenService.deleteAuthTokenData();
     }
 
     public refreshAuth(authToken: string, expiresInMillis: number): void {
+        console.log('refresh auth');
         this.clearAuth();
         this.authTokenService.saveAuthTokenData(authToken, expiresInMillis);
         this.authTokenService.startAuthTokenExpirationTimer(expiresInMillis);
+    }
+
+    public continueAuth(): void {
+        this.authTokenService.continueAuthExpirationTimer();
     }
 }

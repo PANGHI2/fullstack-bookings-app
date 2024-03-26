@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, Subscription, take, tap, timer } from 'rxjs';
-import { LOCAL_STORAGE_KEYS } from '../utils/constants';
+import { LOCAL_STORAGE_KEYS } from '../utils/constants.utils';
 
 @Injectable({
     providedIn: 'root',
@@ -9,8 +9,6 @@ export class AuthTokenService {
     public authTokenExpirationSubject: Subject<void> = new Subject<void>();
 
     private authTokenExpirationTimerSubscription: Subscription | null = null;
-
-    constructor() {}
 
     /* Auth Token Storage Utils*/
     public saveAuthTokenData(authToken: string, expiresInMillis: number): void {
@@ -24,7 +22,14 @@ export class AuthTokenService {
     }
 
     public getAuthTokenIfActive(): string | null {
-        return this.authTokenExpirationTimerSubscription && this.getAuthToken();
+        const authTokenExpirationTimestamp: string | null = this.getAuthTokenExpirationTimestamp();
+
+        return (
+            ((this.isAuthExpirationTimerActive() ||
+                (authTokenExpirationTimestamp && Date.now() < +authTokenExpirationTimestamp)) &&
+                this.getAuthToken()) ||
+            null
+        );
     }
 
     private getAuthToken(): string | null {
@@ -49,9 +54,25 @@ export class AuthTokenService {
             .subscribe();
     }
 
+    public continueAuthExpirationTimer(): void {
+        if (!this.isAuthExpirationTimerActive()) {
+            const authToken: string | null = this.getAuthTokenIfActive();
+            const authTokenExpirationTimestamp: string | null = this.getAuthTokenExpirationTimestamp();
+            if (authToken && authTokenExpirationTimestamp) {
+                const remainingMillis: number = +authTokenExpirationTimestamp - Date.now();
+                this.startAuthTokenExpirationTimer(remainingMillis);
+            }
+        }
+    }
+
     public clearAuthTokenExpirationTimer(): void {
+        console.log('cleared auth token timer');
         this.authTokenExpirationTimerSubscription?.unsubscribe();
         this.authTokenExpirationTimerSubscription = null;
     }
     /**/
+
+    private isAuthExpirationTimerActive(): boolean {
+        return !!this.authTokenExpirationTimerSubscription;
+    }
 }

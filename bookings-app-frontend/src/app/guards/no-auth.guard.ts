@@ -9,6 +9,7 @@ export const noAuthGuard: CanActivateFn = (): boolean => {
     const authTokenService: AuthTokenService = inject(AuthTokenService);
 
     if (authTokenService.getAuthTokenIfActive()) {
+        authService.continueAuth();
         router.navigate(['/dashboard']);
         return false;
     }

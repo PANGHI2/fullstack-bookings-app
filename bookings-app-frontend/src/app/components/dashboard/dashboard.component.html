@@ -2,9 +2,62 @@
     <mat-card>
         <mat-card-header>
             <mat-card-title>Dashboard</mat-card-title>
-            <mat-card-subtitle>Here you can manage your bookings.</mat-card-subtitle>
+            <mat-card-subtitle>This is the place where you can manage your bookings.</mat-card-subtitle>
         </mat-card-header>
-        <mat-card-content> tableeeeeeeee </mat-card-content>
+        <mat-card-content>
+            <div class="table-container">
+                <div class="table-actions">
+                    <button mat-fab color="primary" (click)="openCreateDialog()">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </div>
+                <div class="table-scroll">
+                    <table mat-table [dataSource]="dataSource">
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef>#</th>
+                            <td mat-cell *matCellDef="let booking">{{ booking.id }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="fullname">
+                            <th mat-header-cell *matHeaderCellDef>Name</th>
+                            <td mat-cell *matCellDef="let booking">{{ booking.fullname }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="roomNumber">
+                            <th mat-header-cell *matHeaderCellDef>Room</th>
+                            <td mat-cell *matCellDef="let booking">{{ booking.roomNumber }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="checkIn">
+                            <th mat-header-cell *matHeaderCellDef>Check In</th>
+                            <td mat-cell *matCellDef="let booking">{{ booking.checkIn | date: 'dd.MM.yyyy' }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="checkOut">
+                            <th mat-header-cell *matHeaderCellDef>Check Out</th>
+                            <td mat-cell *matCellDef="let booking">{{ booking.checkOut | date: 'dd.MM.yyyy' }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef>Actions</th>
+                            <td mat-cell *matCellDef="let booking">
+                                <button mat-mini-fab color="primary" (click)="openEditDialog(booking)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                                <button mat-mini-fab color="warn" (click)="openDeleteDialog(booking.id)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <ng-container *ngIf="dataSource.data.length">
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                        </ng-container>
+                    </table>
+                    <div *ngIf="!dataSource.data.length" class="loading-wrapper">
+                        <mat-spinner diameter="50"></mat-spinner>
+                        Loading...
+                    </div>
+                </div>
+            </div>
+            <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons aria-label="Select page of bookings">
+            </mat-paginator>
+        </mat-card-content>
         <mat-divider></mat-divider>
         <mat-card-actions>
             <button mat-raised-button color="primary" (click)="logout()">Log Out</button>

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { HttpRestAuthInterceptor } from './http-rest-auth.interceptor.service';
+import { HttpRestAuthInterceptor } from './http-rest-auth.interceptor';
 
 describe('HttpRestAuthInterceptor', () => {
     beforeEach(() =>

@@ -1,0 +1,32 @@
+<h1 mat-dialog-title>Edit Booking</h1>
+<div class="dialog-content" mat-dialog-content>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline">
+            <mat-label>Full Name</mat-label>
+            <input matInput formControlName="fullname" />
+            <mat-error *ngIf="form.get('fullname')?.errors?.['required']">Full name is required.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Room Number</mat-label>
+            <input matInput formControlName="roomNumber" />
+            <mat-error *ngIf="form.get('roomNumber')?.errors?.['required']">Room number is required.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Check-In / Check-Out</mat-label>
+            <mat-date-range-input formGroupName="range" [rangePicker]="picker">
+                <input matStartDate placeholder="Check-In" formControlName="start" [min]="minDate" />
+                <input matEndDate placeholder="Check-Out" formControlName="end" [min]="minDate" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+            <mat-error *ngIf="form.get(['range', 'start'])?.errors?.['required']">Check-In date is required.</mat-error>
+            <mat-error *ngIf="form.get(['range', 'end'])?.errors?.['required']">Check-Out date is required.</mat-error>
+        </mat-form-field>
+        <div mat-dialog-actions align="center">
+            <button mat-button (click)="dialogRef.close()">Cancel</button>
+            <button mat-raised-button type="submit" color="primary" [disabled]="!form.valid">Edit</button>
+        </div>
+    </form>
+</div>

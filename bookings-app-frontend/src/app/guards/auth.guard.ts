@@ -14,5 +14,6 @@ export const authGuard: CanActivateFn = (): boolean => {
         return false;
     }
 
+    authService.continueAuth();
     return true;
 };

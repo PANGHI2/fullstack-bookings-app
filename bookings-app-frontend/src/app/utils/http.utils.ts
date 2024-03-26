@@ -1,8 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-
-export type KeyValueObject = {
-    [key: string]: string | number | boolean | null | undefined;
-};
+import { KeyValueObject } from './types.utils';
 
 export function createHttpParams(keyValueObject: KeyValueObject): HttpParams {
     return Object.keys(keyValueObject).reduce(

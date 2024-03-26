@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Booking } from '../../../../models/domain/booking.model';
+import { ModelConverter } from '../../../../utils/helpers/model-converter.helper';
+import { CreateBookingPayload } from '../../../../models/api/bookings/create-booking-payload.model';
 
 @Component({
     selector: 'app-create-booking-dialog',
@@ -16,7 +19,6 @@ export class CreateBookingDialogComponent {
             end: new FormControl(new Date(), Validators.required),
         }),
     });
-
     public minDate: Date;
 
     constructor(public dialogRef: MatDialogRef<CreateBookingDialogComponent>) {
@@ -25,20 +27,25 @@ export class CreateBookingDialogComponent {
     }
 
     submit(): void {
-        console.log('submit');
         if (this.form.valid) {
-            const {
-                fullname,
-                roomNumber,
-                range: { start, end },
-            } = this.form.value;
+            const converted: CreateBookingPayload = new ModelConverter<any, CreateBookingPayload>(
+                (a: any): CreateBookingPayload => {
+                    const {
+                        fullname,
+                        roomNumber,
+                        range: { start, end },
+                    } = a;
 
-            this.dialogRef.close({
-                fullname,
-                roomNumber,
-                checkIn: new Date(start).getTime(),
-                checkOut: new Date(end).getTime(),
-            });
+                    return {
+                        fullname,
+                        roomNumber,
+                        checkIn: Math.floor(new Date(start).getTime() / 1000),
+                        checkOut: Math.floor(new Date(end).getTime() / 1000),
+                    };
+                }
+            ).convert(this.form.value);
+
+            this.dialogRef.close(converted);
         }
     }
 }

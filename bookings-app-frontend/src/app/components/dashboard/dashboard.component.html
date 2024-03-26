@@ -45,18 +45,30 @@
                             </td>
                         </ng-container>
                         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-                        <ng-container *ngIf="dataSource.data.length">
+                        <ng-container *ngIf="dataSource.data.length > 0">
                             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
                         </ng-container>
                     </table>
-                    <div *ngIf="!dataSource.data.length" class="loading-wrapper">
+                    <div *ngIf="isLoading" class="loading-wrapper">
                         <mat-spinner diameter="50"></mat-spinner>
                         Loading...
                     </div>
+                    <div *ngIf="dataSource.data.length === 0" class="loading-wrapper">No bookings found.</div>
                 </div>
             </div>
-            <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons aria-label="Select page of bookings">
-            </mat-paginator>
+            <div [formGroup]="datepicker" class="content-filter">
+                <mat-form-field appearance="outline">
+                    <mat-label>Filter Bookings From / To</mat-label>
+                    <mat-date-range-input formGroupName="range" [rangePicker]="picker">
+                        <input matStartDate placeholder="From" formControlName="from" />
+                        <input matEndDate placeholder="To" formControlName="to" />
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                </mat-form-field>
+                <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons aria-label="Select page of bookings">
+                </mat-paginator>
+            </div>
         </mat-card-content>
         <mat-divider></mat-divider>
         <mat-card-actions>

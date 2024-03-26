@@ -43,7 +43,6 @@ export class AuthTokenService {
 
     /* Auth Token Expiration Timer */
     public startAuthTokenExpirationTimer(expiresInMillis: number): void {
-        console.log('timer set for millis: ', expiresInMillis);
         this.authTokenExpirationTimerSubscription = timer(expiresInMillis)
             .pipe(
                 take(1),
@@ -66,7 +65,6 @@ export class AuthTokenService {
     }
 
     public clearAuthTokenExpirationTimer(): void {
-        console.log('cleared auth token timer');
         this.authTokenExpirationTimerSubscription?.unsubscribe();
         this.authTokenExpirationTimerSubscription = null;
     }

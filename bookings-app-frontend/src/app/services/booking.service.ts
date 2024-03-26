@@ -70,7 +70,6 @@ export class BookingService {
     }
 
     createOne(booking: CreateBookingPayload): Observable<Booking> {
-        console.log('trying to create', booking);
         const bookingsUrl: string = `${environment.apiUrl}${API_ENDPOINTS.bookings}`;
 
         return this.http

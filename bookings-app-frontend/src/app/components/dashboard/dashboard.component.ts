@@ -1,14 +1,16 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { filter, finalize, Observable, switchMap, take, tap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Booking } from '../../models/domain/booking.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { BookingService } from '../../services/booking.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { CreateBookingDialogComponent } from './dialog/create-booking-dialog/create-booking-dialog.component';
 import { EditBookingDialogComponent } from './dialog/edit-booking-dialog/edit-booking-dialog.component';
 import { DeleteBookingDialogComponent } from './dialog/delete-booking-dialog/delete-booking-dialog.component';
-import { filter, switchMap, take } from 'rxjs';
-import { CreateBookingDialogComponent } from './dialog/create-booking-dialog/create-booking-dialog.component';
+import { CreateBookingPayload } from '../../models/api/bookings/create-booking-payload.model';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-dashboard',
@@ -20,7 +22,16 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     public dataSource: MatTableDataSource<Booking> = new MatTableDataSource<Booking>();
 
+    public isLoading: boolean = false;
+
     @ViewChild(MatPaginator) paginator?: MatPaginator;
+
+    public datepicker: FormGroup = new FormGroup({
+        range: new FormGroup({
+            from: new FormControl(null),
+            to: new FormControl(null),
+        }),
+    });
 
     constructor(
         private dialog: MatDialog,
@@ -29,9 +40,18 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     ) {}
 
     ngOnInit(): void {
-        this.bookingService.getMany().subscribe((bookings: Booking[]): void => {
-            this.dataSource.data = bookings;
-        });
+        this.reloadData().subscribe();
+        this.datepicker
+            .get('range')
+            ?.valueChanges.pipe(
+                filter(({ from, to }) => from && to),
+                switchMap(({ from, to }): Observable<Booking[]> => {
+                    const fromTimestamp: number = Math.floor(new Date(from).getTime() / 1000);
+                    const toTimestamp: number = Math.floor(new Date(to).getTime() / 1000);
+                    return this.reloadData(fromTimestamp, toTimestamp);
+                })
+            )
+            .subscribe();
     }
 
     public ngAfterViewInit(): void {
@@ -39,8 +59,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     public logout(): void {
-        console.log(`Trying logout`);
-
         this.authService.logout().subscribe();
     }
 
@@ -53,11 +71,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             .pipe(
                 take(1),
                 filter(Boolean),
-                switchMap((booking: Booking) =>
-                    this.bookingService.createOne(
-                        this.bookingService.converters.bookingToCreateBookingPayload.convert(booking)
-                    )
-                )
+                switchMap((createBookingPayload: CreateBookingPayload) => {
+                    return this.bookingService.createOne(createBookingPayload);
+                })
             )
             .subscribe((createdBooking: Booking): void => {
                 this.dataSource.data.unshift(createdBooking);
@@ -78,11 +94,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             .pipe(
                 take(1),
                 filter(Boolean),
-                switchMap((booking: Booking) =>
-                    this.bookingService.updateOne(
-                        booking.id,
-                        this.bookingService.converters.bookingToUpdateBookingPayload.convert(booking)
-                    )
+                switchMap(({ id, ...updateBookingPayload }: Booking) =>
+                    this.bookingService.updateOne(id, updateBookingPayload)
                 )
             )
             .subscribe((updatedBooking: Booking): void => {
@@ -116,5 +129,16 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                     (booking: Booking): boolean => booking.id !== bookingId
                 );
             });
+    }
+
+    private reloadData(from?: number, to?: number): Observable<Booking[]> {
+        this.isLoading = true;
+        return this.bookingService.getMany({ from, to }).pipe(
+            tap((bookings: Booking[]): void => {
+                console.log('the bookings', bookings);
+                this.isLoading = false;
+                this.dataSource.data = bookings;
+            })
+        );
     }
 }

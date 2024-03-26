@@ -70,13 +70,11 @@ export class AuthService {
     }
 
     public clearAuth(): void {
-        console.log('clear auth');
         this.authTokenService.clearAuthTokenExpirationTimer();
         this.authTokenService.deleteAuthTokenData();
     }
 
     public refreshAuth(authToken: string, expiresInMillis: number): void {
-        console.log('refresh auth');
         this.clearAuth();
         this.authTokenService.saveAuthTokenData(authToken, expiresInMillis);
         this.authTokenService.startAuthTokenExpirationTimer(expiresInMillis);

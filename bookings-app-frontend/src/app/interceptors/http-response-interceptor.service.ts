@@ -20,16 +20,16 @@ export class HttpResponseInterceptor implements HttpInterceptor {
     ) {}
 
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-        console.log(`%cHTTP request to: ${request.url}`, 'color: yellow');
+        //console.log(`%cHTTP request to: ${request.url}`, 'color: yellow');
 
         return next.handle(request).pipe(
             tap((event: HttpEvent<unknown>): void => {
                 if (event instanceof HttpResponse) {
-                    console.log(`%c[SUCCESS] ${request.url} response:`, 'color: green', event.body);
+                    console.debug(`%c[SUCCESS] ${request.method} ${request.url} response:`, 'color: green', event.body);
                 }
             }),
             catchError((error: HttpErrorResponse) => {
-                console.error(`%c[ERROR] ${request.url} response:`, 'color: red', error);
+                console.debug(`%c[ERROR] ${request.method} ${request.url} response:`, 'color: red', error);
                 if (error.status === HttpStatusCode.Forbidden || error.status === HttpStatusCode.Unauthorized) {
                     this.authService.clearAuth();
                     this.router.navigate(['/login']);

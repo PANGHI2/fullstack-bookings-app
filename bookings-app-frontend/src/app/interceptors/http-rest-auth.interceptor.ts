@@ -20,7 +20,6 @@ export class HttpRestAuthInterceptor implements HttpInterceptor {
 
         if (endpointRequiresAuthToken) {
             if (!(authToken = this.authTokenService.getAuthTokenIfActive())) {
-                console.log('interceptor clearing the auth');
                 this.authService.clearAuth();
                 this.router.navigate(['/login']);
                 return EMPTY;

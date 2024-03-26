@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UpdateBookingPayload } from '../../../../models/api/bookings/update-booking-payload.model';
+import { Booking } from '../../../../models/domain/booking.model';
+import { ModelConverter } from '../../../../utils/helpers/model-converter.helper';
 
 @Component({
     selector: 'app-edit-booking-dialog',
@@ -10,36 +12,42 @@ import { UpdateBookingPayload } from '../../../../models/api/bookings/update-boo
 })
 export class EditBookingDialogComponent {
     public form: FormGroup = new FormGroup({
-        fullname: new FormControl(''),
-        roomNumber: new FormControl(''),
+        fullname: new FormControl(this.data.fullname, Validators.required),
+        roomNumber: new FormControl(this.data.roomNumber, Validators.required),
         range: new FormGroup({
-            start: new FormControl(new Date()),
-            end: new FormControl(new Date()),
+            start: new FormControl(new Date(this.data.checkIn), Validators.required),
+            end: new FormControl(new Date(this.data.checkOut), Validators.required),
         }),
     });
-
     public minDate: Date;
 
-    constructor(public dialogRef: MatDialogRef<UpdateBookingPayload>) {
+    constructor(
+        public dialogRef: MatDialogRef<UpdateBookingPayload>,
+        @Inject(MAT_DIALOG_DATA) public data: Booking
+    ) {
         this.minDate = new Date();
         this.minDate.setHours(0, 0, 0, 0);
     }
 
     submit(): void {
-        console.log('submit');
         if (this.form.valid) {
-            const {
-                fullname,
-                roomNumber,
-                range: { start, end },
-            } = this.form.value;
+            const converted: Booking = new ModelConverter<any, Booking>((a: any): Booking => {
+                const {
+                    fullname,
+                    roomNumber,
+                    range: { start, end },
+                } = a;
 
-            this.dialogRef.close({
-                fullname,
-                roomNumber,
-                checkIn: new Date(start).getTime(),
-                checkOut: new Date(end).getTime(),
-            });
+                return {
+                    id: this.data.id,
+                    fullname,
+                    roomNumber,
+                    checkIn: Math.floor(new Date(start).getTime() / 1000),
+                    checkOut: Math.floor(new Date(end).getTime() / 1000),
+                };
+            }).convert(this.form.value);
+
+            this.dialogRef.close(converted);
         }
     }
 }

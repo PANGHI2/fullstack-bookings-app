@@ -23,7 +23,7 @@ class BookingFactory extends Factory
         return [
             'user_id' => fake()->numberBetween(11, 12),
             'fullname' => fake()->name(),
-            'roomNumber' => fake()->bothify('Room ##??'),
+            'roomNumber' => fake()->bothify('####??'),
             'checkIn' => $checkIn->getTimestamp(),
             'checkOut' => $checkOut->getTimestamp(),
         ];

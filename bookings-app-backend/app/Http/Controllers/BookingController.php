@@ -24,15 +24,17 @@ class BookingController extends Controller
         $bookingsQuery = auth()->user()->bookings();
         if ($from && $to) {
             $bookingsQuery->where(function ($q) use ($from, $to) {
-                $q->where('checkin', '<', $from)
-                    ->where('checkout', '>', $to);
-            })->orWhereBetween('checkin', [$from, $to])
-                ->orWhereBetween('checkout', [$from, $to]);
+                $q->where('checkIn', '<', $from)
+                    ->where('checkOut', '>', $to);
+            })->orWhereBetween('checkIn', [$from, $to])
+                ->orWhereBetween('checkOut', [$from, $to]);
         } elseif ($from) {
-            $bookingsQuery->where('checkout', '>=', $from);
+            $bookingsQuery->where('checkOut', '>=', $from);
         } elseif ($to) {
-            $bookingsQuery->where('checkin', '<=', $to);
+            $bookingsQuery->where('checkIn', '<=', $to);
         }
+
+        $bookingsQuery->orderBy('updated_at', 'desc');
 
         if ($request->has('page')) {
             $bookings = $bookingsQuery->paginate(10);
@@ -48,8 +50,8 @@ class BookingController extends Controller
         $validated = $request->validate([
             'fullname' => 'required|string|max:255',
             'roomNumber' => 'required|string|max:255',
-            'checkIn' => 'required|date',
-            'checkOut' => 'required|date',
+            'checkIn' => 'required|integer',
+            'checkOut' => 'required|integer',
         ]);
 
         $booking = new Booking($validated);
@@ -64,8 +66,8 @@ class BookingController extends Controller
         $validated = $request->validate([
             'fullname' => 'sometimes|required|string|max:255',
             'roomNumber' => 'sometimes|required|string|max:255',
-            'checkIn' => 'sometimes|required|date',
-            'checkOut' => 'sometimes|required|date',
+            'checkIn' => 'sometimes|required|integer',
+            'checkOut' => 'sometimes|required|integer',
         ]);
 
         $booking = auth()->user()->bookings()->findOrFail($bookingId);
